@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Souq AI - WhatsApp Chatbots for Restaurants & Groceries</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Poppins', sans-serif;
+      position: relative;
+      overflow-x: hidden;
+      color: #eee;
+    }
+
+    /* Background image container */
+    .background {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url('https://images.unsplash.com/photo-1568992687947-868a62a9f521?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center/cover;
+      filter: brightness(0.35);
+      z-index: -2;
+    }
+
+    /* Black translucent overlay */
+    .overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: -1;
+    }
+
+    /* Container for all content */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      z-index: 10;
+      padding: 1rem 0;
+      backdrop-filter: blur(6px);
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav ul li a {
+      color: #00e676;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    nav ul li a:hover,
+    nav ul li a.active {
+      color: #81c784;
+    }
+
+    /* Sections */
+    section {
+      padding: 6rem 1rem 4rem;
+      min-height: 100vh;
+    }
+
+    section h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+
+    /* Home Section */
+    #home {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #c8facc;
+      min-height: 90vh;
+    }
+
+    #home h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    #home p {
+      font-size: 1.3rem;
+      max-width: 700px;
+      margin-bottom: 2rem;
+      line-height: 1.4;
+    }
+
+    #home button {
+      background: #00e676;
+      color: black;
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 5px 15px rgba(0,230,118,0.5);
+      transition: background-color 0.3s ease;
+    }
+
+    #home button:hover {
+      background: #00c853;
+    }
+
+    /* About Section */
+    #about p {
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+      font-size: 1.1rem;
+      color: #d0f0c0;
+    }
+
+    /* Team Section */
+    .team-container {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .team-member {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      padding: 1rem;
+      max-width: 220px;
+      text-align: center;
+      box-shadow: 0 8px 16px rgba(0, 230, 118, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .team-member:hover {
+      transform: translateY(-10px);
+    }
+
+    .team-member img {
+      width: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      height: 250px;
+      margin-bottom: 1rem;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+    }
+
+    .team-member h4 {
+      margin: 0.5rem 0 0.3rem;
+      font-weight: 600;
+      color: #a5d6a7;
+    }
+
+    .team-member p {
+      margin: 0;
+      color: #c8facc;
+      font-size: 0.9rem;
+    }
+
+    /* Pricing Section - FLIP CARDS with neon green border */
+    .pricing-cards {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      perspective: 1200px; /* needed for 3D flip effect */
+    }
+
+    .pricing-card {
+      width: 280px;
+      height: 380px;
+      position: relative;
+      cursor: pointer;
+      border-radius: 16px;
+      box-shadow:
+        0 0 8px #00e676,
+        0 0 20px #00e676,
+        0 0 40px #00ff88;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .pricing-card:hover {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 16px;
+      color: #c8facc;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1.5rem;
+      box-sizing: border-box;
+    }
+
+    .card-front h3 {
+      color: #81c784;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      font-size: 1.8rem;
+    }
+
+    .card-front .price {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #00e676;
+    }
+
+    .card-front ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem 0;
+      width: 100%;
+      text-align: left;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #c8facc;
+    }
+
+    .card-front ul li {
+      margin-bottom: 0.8rem;
+    }
+
+    /* Back side */
+    .card-back {
+      background: rgba(0, 230, 118, 0.1);
+      color: #004d00;
+      transform: rotateY(180deg);
+      box-shadow:
+        0 0 15px #00e676,
+        inset 0 0 20px #00e676;
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .card-back p {
+      margin-bottom: 2rem;
+      color: #004d00;
+    }
+
+    .card-back button {
+      background: #00e676;
+      border: none;
+      padding: 0.8rem 2.5rem;
+      border-radius: 30px;
+      font-weight: 700;
+      cursor: pointer;
+      color: black;
+      box-shadow: 0 5px 15px rgba(0,230,118,0.6);
+      transition: background-color 0.3s ease;
+    }
+
+    .card-back button:hover {
+      background: #00c853;
+    }
+
+    /* FAQ Section */
+    .faq-container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      background: rgba(0,0,0,0.5);
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      color: #c8facc;
+    }
+
+    .faq-item:hover {
+      background: rgba(0,230,118,0.1);
+    }
+
+    .faq-question {
+      font-weight: 600;
+      position: relative;
+      padding-right: 20px;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 0.5rem;
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+      color: #d0f0c0;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    /* Contact Section */
+    #contact p {
+      text-align: center;
+      color: #ccc;
+      max-width: 600px;
+      margin: auto;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .pricing-cards {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+  <div class="overlay"></div>
+
+  <nav>
+    <ul>
+      <li><a href="#home" class="active">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#team">Team</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+
+    <section id="home">
+      <h1>Souq AI</h1>
+      <p>WhatsApp chatbots that help restaurants and groceries take orders and make deliveries automatically.</p>
+      <button>Get Started</button>
+    </section>
+
+    <section id="about">
+      <h2>About Us</h2>
+      <p>Souq AI empowers food and grocery businesses by automating orders and deliveries through WhatsApp chatbots — reducing workload and boosting sales.</p>
+    </section>
+
+    <!-- Team Section -->
+<section id="team">
+  <h2>Meet Our Team</h2>
+  <div class="team-container">
+    <div class="team-member">
+      <img src="https://images.unsplash.com/photo-a-young-man-wearing-a-white-suit-and-black-sunglasses-82OrzjjuEVk?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Shezin - Marketing" />
+      <h4>Shezin</h4>
+      <p>Marketing Lead</p>
+    </div>
+    <div class="team-member">
+      <img src="https://images.unsplash.com/photos/man-in-black-and-white-knit-cap-and-black-framed-eyeglasses-HZS-CkFEQds?ixlib=rb‑4.0.3&auto=format&fit=crop&w=400&q=80
+" alt="Athar - CEO" />
+      <h4>Athar</h4>
+      <p>CTO & AI Specialist</p>
+    </div>
+    <div class="team-member">
+      <img src="https://randomuser.me/api/portraits/men/66.jpg" alt="Ibrahim - Specialist" />
+      <h4>Ibrahim</h4>
+      <p>Founder & Managing Director</p>
+    </div>
+  </div>
+</section>
+
+
+<section id="pricing">
+  <h2>Pricing Plans</h2>
+  <div class="pricing-cards">
+    <!-- Basic -->
+    <div class="pricing-card">
+      <div class="card-front">
+        <h3>Basic</h3>
+        <div class="price">20 KWD<span style="font-size:1rem;">/mo</span></div>
+        <ul>
+          <li>Up to 100 orders/month</li>
+          <li>Basic support</li>
+          <li>Limited customization</li>
+        </ul>
+      </div>
+      <div class="card-back">
+        <p>Perfect for small restaurants getting started with automation.</p>
+        <button>Choose Basic</button>
+      </div>
+    </div>
+
+    <!-- Pro -->
+    <div class="pricing-card">
+      <div class="card-front">
+        <h3>Pro</h3>
+        <div class="price">100 KWD<span style="font-size:1rem;">/mo</span></div>
+        <ul>
+          <li>Up to 500 orders/month</li>
+          <li>Priority support</li>
+          <li>Advanced customization</li>
+        </ul>
+      </div>
+      <div class="card-back">
+        <p>For growing businesses needing advanced features and support.</p>
+        <button>Choose Pro</button>
+      </div>
+    </div>
+
+    <!-- Enterprise -->
+    <div class="pricing-card">
+      <div class="card-front">
+        <h3>Enterprise</h3>
+        <div class="price">500 KWD<span style="font-size:1rem;">/mo</span></div>
+        <ul>
+          <li>Unlimited orders</li>
+          <li>Dedicated support</li>
+          <li>Full customization</li>
+        </ul>
+      </div>
+      <div class="card-back">
+        <p>Ideal for large enterprises with custom needs.</p>
+        <button>Contact Sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+    <section id="faq">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-container">
+        <div class="faq-item">
+          <div class="faq-question">How does the WhatsApp chatbot work?</div>
+          <div class="faq-answer">Our chatbot automates order taking and delivery coordination directly through WhatsApp messages.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Can I customize the chatbot?</div>
+          <div class="faq-answer">Yes, with Pro and Enterprise plans, you get advanced and full customization options.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Is there a free trial available?</div>
+          <div class="faq-answer">We offer a 14-day free trial on the Basic plan. No credit card required.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>Want to learn more? Reach out to us at <a href="mailto:souqAIwebsite@gmail.com">souqAIwebsite@gmail.com</a> or call us at <a href="tel:+965 athar a bitch">+965 athar a bitch</a>.</p>
+    </section>
+
+  <script>
+    // FAQ toggle script
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.addEventListener('click', () => {
+        item.classList.toggle('open');
+      });
+    });
+
+    // Smooth scroll and active nav highlighting
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('nav ul li a');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 70;
+        if (pageYOffset >= sectionTop) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').slice(1) === current) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // Smooth scrolling for nav links
+    navLinks.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').slice(1);
+        document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
