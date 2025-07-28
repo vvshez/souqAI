@@ -472,46 +472,56 @@
   </div>
 
 <script>
-  // FAQ toggle stays unchanged
+  // FAQ toggle
   document.querySelectorAll('.faq-item').forEach(item => {
     item.addEventListener('click', () => item.classList.toggle('open'));
   });
 
-  // Active nav highlighting stays the same
-  const sections = document.querySelectorAll('section');
+  // Smooth scroll with offset (desktop + mobile)
   const navLinks = document.querySelectorAll('nav ul li a');
+  const header = document.querySelector('nav');
 
-  window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(section => {
-      const sectionTop = section.offsetTop - 70;
-      if (window.pageYOffset >= sectionTop) {
-        current = section.getAttribute('id');
-      }
-    });
-    navLinks.forEach(link => {
-      link.classList.toggle('active', link.getAttribute('href').slice(1) === current);
-    });
-  });
-
-  // Manual smooth scrolling accounting for header height
   navLinks.forEach(link => {
-    link.addEventListener('click', e => {
+    link.addEventListener('click', function(e) {
       e.preventDefault();
-      const targetId = link.getAttribute('href').slice(1);
-      const targetEl = document.getElementById(targetId);
-      if (!targetEl) return;
+      const targetId = this.getAttribute('href').substring(1);
+      const targetSection = document.getElementById(targetId);
 
-      const headerHeight = document.querySelector('nav').offsetHeight;
-      const targetPosition = targetEl.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+      if (!targetSection) return;
+
+      const headerHeight = header.offsetHeight;
+      const sectionTop = targetSection.offsetTop - headerHeight;
 
       window.scrollTo({
-        top: targetPosition,
+        top: sectionTop,
         behavior: 'smooth'
       });
     });
   });
+
+  // Active nav highlighting
+  const sections = document.querySelectorAll('section');
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.pageYOffset;
+
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop - header.offsetHeight - 20;
+      const sectionHeight = section.offsetHeight;
+      const sectionId = section.getAttribute('id');
+
+      if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${sectionId}`) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  });
 </script>
+
 
 </body>
 </html>
