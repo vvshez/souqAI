@@ -390,11 +390,61 @@
     </section>
 
     <section id="pricing">
-      <h2>Pricing Plans</h2>
-      <div class="pricing-cards">
-        <!-- Cards here (unchanged) -->
+  <h2>Pricing Plans</h2>
+  <div class="pricing-cards">
+    <!-- Basic -->
+    <div class="pricing-card">
+      <div class="card-front">
+        <h3>Basic</h3>
+        <div class="price">20 KWD<span style="font-size:1rem;">/mo</span></div>
+        <ul>
+          <li>Up to 100 orders/month</li>
+          <li>Basic support</li>
+          <li>Limited customization</li>
+        </ul>
       </div>
-    </section>
+      <div class="card-back">
+        <p>Perfect for small restaurants getting started with automation.</p>
+        <button>Choose Basic</button>
+      </div>
+    </div>
+
+    <!-- Pro -->
+    <div class="pricing-card">
+      <div class="card-front">
+        <h3>Pro</h3>
+        <div class="price">100 KWD<span style="font-size:1rem;">/mo</span></div>
+        <ul>
+          <li>Up to 500 orders/month</li>
+          <li>Priority support</li>
+          <li>Advanced customization</li>
+        </ul>
+      </div>
+      <div class="card-back">
+        <p>For growing businesses needing advanced features and support.</p>
+        <button>Choose Pro</button>
+      </div>
+    </div>
+
+    <!-- Enterprise -->
+    <div class="pricing-card">
+      <div class="card-front">
+        <h3>Enterprise</h3>
+        <div class="price">500 KWD<span style="font-size:1rem;">/mo</span></div>
+        <ul>
+          <li>Unlimited orders</li>
+          <li>Dedicated support</li>
+          <li>Full customization</li>
+        </ul>
+      </div>
+      <div class="card-back">
+        <p>Ideal for large enterprises with custom needs.</p>
+        <button>Contact Sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 
     <section id="faq">
       <h2>Frequently Asked Questions</h2>
@@ -421,43 +471,47 @@
 
   </div>
 
-  <script>
-    // FAQ toggle
-    document.querySelectorAll('.faq-item').forEach(item => {
-      item.addEventListener('click', () => {
-        item.classList.toggle('open');
-      });
+<script>
+  // FAQ toggle stays unchanged
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.addEventListener('click', () => item.classList.toggle('open'));
+  });
+
+  // Active nav highlighting stays the same
+  const sections = document.querySelectorAll('section');
+  const navLinks = document.querySelectorAll('nav ul li a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop - 70;
+      if (window.pageYOffset >= sectionTop) {
+        current = section.getAttribute('id');
+      }
     });
-
-    // Active nav highlighting
-    const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('nav ul li a');
-
-    window.addEventListener('scroll', () => {
-      let current = '';
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop - 70;
-        if (pageYOffset >= sectionTop) {
-          current = section.getAttribute('id');
-        }
-      });
-
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').slice(1) === current) {
-          link.classList.add('active');
-        }
-      });
-    });
-
-    // Smooth scrolling for nav links
     navLinks.forEach(link => {
-      link.addEventListener('click', e => {
-        e.preventDefault();
-        const targetId = link.getAttribute('href').slice(1);
-        document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
+      link.classList.toggle('active', link.getAttribute('href').slice(1) === current);
+    });
+  });
+
+  // Manual smooth scrolling accounting for header height
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href').slice(1);
+      const targetEl = document.getElementById(targetId);
+      if (!targetEl) return;
+
+      const headerHeight = document.querySelector('nav').offsetHeight;
+      const targetPosition = targetEl.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
       });
     });
-  </script>
+  });
+</script>
+
 </body>
 </html>
